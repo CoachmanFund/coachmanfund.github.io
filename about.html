@@ -1,0 +1,134 @@
+---
+layout: page
+title: "About"
+description: "Hey, this is RoyCheng."
+header-img: "img/gif/about.gif"
+---
+
+
+<!-- English Version -->
+<div class="en post-container">
+
+    <!--copied from markdown -->
+    <blockquote><p>Welcome to the Quant World</p></blockquote>
+
+    <p>Hey，I am <strong>RoyCheng</strong>，a master student majoring in mathematics in finance at NYU Courant.</p>
+
+    <p>In this website, I posted some of my research reports and notes to share with you and hope you could find something useful here.</p>
+
+    <p>This personal blog is established by <a href="https://pages.github.com/">GitHub Pages</a> 与 <a href="http://jekyll.com.cn/">Jekyll</a>. Welcome to my GitHub page<a href="https://github.com/RoyCheng1997">👉GitHub·RoyCheng1997</a> and Linkedin website<a href="https://www.linkedin.com/in/xiao-cheng-943157129/">👉RoyCheng</a>. If you have any question, please feel free to reach out.</p>
+
+    <p></p>
+    
+    <h2>Links</h2>
+
+    <ul>
+        <li><a href="http://roycheng.cn/">RoyCheng</a></li> 
+        <li><a href="https://math.nyu.edu/financial_mathematics/">NYU, Mathematics in Finance</a></li>
+        <li><a href="http://www.acem.sjtu.edu.cn/">Shanghai Jiao Tong University, ACEM</a></li>
+    </ul>
+
+    <p></p>
+    
+    <h2>Archives</h2>
+
+    {% for post in site.posts  %}
+        {% capture this_year %}{{ post.date | date: "%Y" }}{% endcapture %}
+        {% capture this_month %}{{ post.date | date: "%B" }}{% endcapture %}
+        {% capture next_year %}{{ post.previous.date | date: "%Y" }}{% endcapture %}
+        {% capture next_month %}{{ post.previous.date | date: "%B" }}{% endcapture %}
+
+        {% if forloop.first %}
+        <h5>
+            <legend id="{{this_year}}-{{this_month}}">{{this_year}} {{this_month}}</legend>
+        </h5>
+        <ul>
+            {% endif %}
+
+            <li><span>{{ post.date | date: "%F" }}</span> &raquo; <a href="{{ BASE_PATH }}{{ post.url }}">{{ post.title }}</a></li>
+
+            {% if forloop.last %}
+        </ul>
+        {% else %} {% if this_year != next_year %}
+        </ul>
+
+            <h2>
+                <legend id="{{next_year}}-{{next_month}}">{{next_year}} {{next_month}}</legend>
+            </h2>
+        <ul>
+        {% else %}    
+            {% if this_month != next_month %}
+            </ul>
+            <h2><legend id="{{next_year}}-{{next_month}}">{{next_year}} {{next_month}}</legend></h2>
+            <ul>
+            {% endif %}
+            {% endif %}
+        {% endif %}
+    {% endfor%}
+    {% assign posts_collate = nil %}
+
+</div>
+
+
+<!-- Handle Language Change -->
+<script type="text/javascript">
+    // get nodes
+    var $zh = document.querySelector(".zh");
+    var $en = document.querySelector(".en");
+    var $select = document.querySelector("select");
+
+    // bind hashchange event
+    window.addEventListener('hashchange', _render);
+
+    // handle render
+    function _render(){
+        var _hash = window.location.hash;
+        // en
+        if(_hash == "#en"){
+            $select.selectedIndex = 1;
+            $en.style.display = "block";
+            $zh.style.display = "none";
+        // zh by default
+        }else{
+            // not trigger onChange, otherwise cause a loop call.
+            $select.selectedIndex = 0;
+            $zh.style.display = "block";
+            $en.style.display = "none";
+        }
+    }
+
+    // handle select change
+    function onLanChange(index){
+        if(index == 0){
+            window.location.hash = "#zh"
+        }else{
+            window.location.hash = "#en"
+        }
+    }
+
+    // init
+    _render();
+</script>
+
+<!-- Gitalk 评论 start  -->
+{% if site.gitalk.enable %}
+<!-- Gitalk link  -->
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk@latest/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+    <script type="text/javascript">
+    var gitalk = new Gitalk({
+    clientID: '{{site.gitalk.clientID}}',
+    clientSecret: '{{site.gitalk.clientSecret}}',
+    repo: '{{site.gitalk.repo}}',
+    owner: '{{site.gitalk.owner}}',
+    admin: ['{{site.gitalk.admin}}'],
+    distractionFreeMode: {{site.gitalk.distractionFreeMode}},
+    id: 'about',
+    });
+    gitalk.render('gitalk-container');
+</script>
+{% endif %}
+<!-- Gitalk end -->
+
