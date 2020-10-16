@@ -58,7 +58,26 @@ layout: default
                 col-md-10 col-md-offset-1
                 post-container">
 
-				{{ content }}
+                <div class="post-content">
+                    <div id="encrypted-post" hidden>
+                        {{ content }}
+                    </div>
+                    <!-- password protection -->
+                    <div class="staticrypt-form">
+                        <div class="staticrypt-instructions">
+                            <p class="staticrypt-title">受保护的文章 | Protected Post</p>
+                            <p>输入正确密钥以解锁文章 | Enter passphrase to unlock the page</p>
+                        </div>
+                        <hr>
+                        <form id="staticrypt-form" action="#" method="post">
+                            <input id="staticrypt-password" type="password" name="password"
+                                placeholder="密钥 | Passphrase" autocomplete="off">                            
+                            <input type="submit" class="staticrypt-decrypt-button" value="解密 | DECRYPT">
+                        </form>
+                    </div>
+                    <hr style="visibility: hidden;">
+                </div>
+
 
                 <hr style="visibility: hidden;">
 
@@ -146,7 +165,7 @@ layout: default
                     <h5><a href="/tags/">FEATURED TAGS</a></h5>
                     <div class="tags">
         				{% for tag in site.tags %}
-                            {% if tag[1].size > {{site.featured-condition-size}} %}
+                            {% if tag[1].size > site.featured-condition-size %}
                 				<a href="/tags/#{{ tag[0] }}" title="{{ tag[0] }}" rel="{{ tag[1].size }}">
                                     {{ tag[0] }}
                                 </a>
@@ -171,6 +190,65 @@ layout: default
     </div>
 </article>
 
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+        inlineMath: [['$','$'], ["\\(","\\)"]]
+        }
+    });
+</script>
+<!-- password protection -->
+<script>
+    var keySize = 256;
+    var iterations = 1000;
+    function decrypt (encryptedMsg, pass) {
+        var salt = CryptoJS.enc.Hex.parse(encryptedMsg.substr(0, 32));
+        var iv = CryptoJS.enc.Hex.parse(encryptedMsg.substr(32, 32))
+        var encrypted = encryptedMsg.substring(64);
+
+        var key = CryptoJS.PBKDF2(pass, salt, {
+            keySize: keySize/32,
+            iterations: iterations
+        });
+
+        var decrypted = CryptoJS.AES.decrypt(encrypted, key, {
+            iv: iv,
+            padding: CryptoJS.pad.Pkcs7,
+            mode: CryptoJS.mode.CBC
+        }).toString(CryptoJS.enc.Utf8);
+        return decrypted;
+    }
+    
+    document.getElementById('staticrypt-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            var passphrase = document.getElementById('staticrypt-password').value;
+            var encryptedMsg = document.getElementById('encrypted-post').getElementsByTagName("p").item(0).innerText;           
+            var encryptedHMAC = encryptedMsg.substring(0, 64);
+            var encryptedHTML = encryptedMsg.substring(64);
+            var decryptedHMAC = CryptoJS.HmacSHA256(encryptedHTML, CryptoJS.SHA256(passphrase).toString()).toString();
+            if (decryptedHMAC !== encryptedHMAC) {
+                alert('Bad passphrase')
+                return;
+            }
+            //back to top
+            var plainHTML = decrypt(encryptedHTML, passphrase);
+            
+            setTimeout(function () {
+                document.getElementsByClassName("post-content")[0].innerHTML = plainHTML;
+                document.getElementsByClassName("catalog-container")[0].classList.toggle('hidden');
+                MathJax.Hub.Config({
+                    tex2jax: {
+                        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+                        inlineMath: [['$', '$'], ["\\(", "\\)"]]
+                    }
+                });
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, "post-content"]);
+            }, 200);
+        });
+    
+</script>
 
 {% if site.disqus_username %}
 <!-- disqus 公共JS代码 start (一个网页只需插入一次) -->
