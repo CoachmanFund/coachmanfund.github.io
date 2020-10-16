@@ -47,18 +47,6 @@ layout: default
     </div>
 </header>
 
-<head>
-    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
-    <script type="text/x-mathjax-config">
-        MathJax.Hub.Config({
-            tex2jax: {
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
-            inlineMath: [['$','$'], ["\\(","\\)"]]
-            }
-        });
-    </script>
-</head>
-
 <!-- Post Content -->
 <article>
     <div class="container">
@@ -69,20 +57,6 @@ layout: default
                 col-lg-8 col-lg-offset-2
                 col-md-10 col-md-offset-1
                 post-container">
-
-
-                <p class="summary">{{ page.category }} 
-                    <svg id="i-clock" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="16" height="16" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                        <circle cx="16" cy="16" r="14" />
-                        <path d="M16 8 L16 16 20 20" />
-                    </svg> Estimated Reading Time (English):
-                    {% assign words = content | number_of_words %}
-                    {% if words < 360 %}
-                        1 min needed
-                    {% else %}
-                        {{ words | divided_by: 180 }} mins needed, please refer to the sidebar.
-                    {% endif %}
-                </p>
 
 				{{ content }}
 

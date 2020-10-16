@@ -33,6 +33,3 @@ Temporary Items
 
 # debug file
 _site
-node_modules/
-gulpfile.js
-_protected/
